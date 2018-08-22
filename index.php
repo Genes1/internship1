@@ -1,9 +1,9 @@
 <?php
-    //DECLARATION
     include "tilda-php/tilda-php-master/classes/Tilda/Api.php";
     include "tilda-php/tilda-php-master/classes/Tilda/LocalProject.php";
     use \Tilda;
-    ini_set("allow_url_fopen", true);                        //will this cause problems?
+    //ini_set('display_errors',1);
+    ini_set("allow_url_fopen", true);   //will this cause problems?
     define('TILDA_PUBLIC_KEY', '5ocb05o8cb32btmoyedg');
     define('TILDA_SECRET_KEY', 'hunr9ueg9woel0ql6fti');
     define('TILDA_PROJECT_ID', '577099');
@@ -15,35 +15,28 @@
     $local->createBaseFolders();
     $local->copyCssFiles('css');
     $local->copyJsFiles('js');
-    $local->copyImagesFiles('img'); //the image copying fails, despite no error message. manual download is farther down
 
-    //saving the html files
-    $projectList = $api->getPagesList(TILDA_PROJECT_ID);
-    $increment = 0;
-    foreach($projectList as $mydata)
-    {
-         $increment = 0;
-         foreach($mydata as $values)
-         {  
-            if($increment == 0){
-                $local->savePage($api->getPage($values));
-            }
-            $increment++;
-         }
+    //saving htaccess, robots, and sitemap
+    file_put_contents("tilda/.htaccess", $api->getProjectExport( TILDA_PROJECT_ID)["htaccess"] );
+    file_put_contents("tilda/sitemap.xml", file_get_contents("http://project" . TILDA_PROJECT_ID . ".tilda.ws/sitemap.xml") );   //http://project788111.tilda.ws/
+    file_put_contents("tilda/robots.txt", file_get_contents("http://project" . TILDA_PROJECT_ID . ".tilda.ws/robots.txt") );
+
+    //saving HTML
+    $pageList = $api->getPagesList(TILDA_PROJECT_ID);
+    foreach($pageList as $page)
+    {  
+        $local->savePage( $api->getPage(array_pop(array_reverse($page))) );
     } 
 
-    //saving the image files manually
-    $increment = 0;
-    foreach($api->getPagesList(TILDA_PROJECT_ID) as $page){
-        foreach($api->getPageExport($page["id"]) as $outerArrAcc)
+    //saving the image files using page export
+    foreach($pageList as $page)
+    {
+        foreach($api->getPageExport($page["id"])["images"] as $image)
         {
-            if ($increment == 11){
-                foreach($outerArrAcc as $innerArr)
-                {     
-                    file_put_contents ('tilda\img\\'.$innerArr["to"], file_get_contents($innerArr["from"]) );
-                }
-            }
-            $increment++;
+           file_put_contents('tilda\img\\'.$image["to"], file_get_contents($image["from"]) );
         } 
     }
+
+    ini_set("allow_url_fopen", false);   //closing just in case
+    
 ?>
