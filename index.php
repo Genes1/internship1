@@ -10,11 +10,11 @@
 
         <h2>Project Information</h2>
         <h3>Project ID:</h3>
-        <input type = "password" name = "project_id"><br>
+        <input type = "password" name = "project_id" value = "577099"><br>
         <h3>Public Key:</h3>
-        <input type = "password" name = "public_key"><br>
+        <input type = "password" name = "public_key" value = "5ocb05o8cb32btmoyedg"><br>
         <h3>Private Key</h3>
-        <input type = "password" name = "private_key"><br><br>
+        <input type = "password" name = "private_key" value = "hunr9ueg9woel0ql6fti"><br><br>
         <input type = "submit" value = "Submit info">
     </form>
 
