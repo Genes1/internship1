@@ -33,11 +33,7 @@
     //==================================
 
     //START TO SAVING================================================
-    //define('TILDA_PROJECT_ID', $info['project_id']);                         //the id should be set on BUTTON PRESS
-    //$api = new Tilda\Api(TILDA_PUBLIC_KEY, TILDA_SECRET_KEY);
-    //$local = new Tilda\LocalProject(array('projectDir' => 'tilda'));
-    //$local->setProject($api->getProjectExport(TILDA_PROJECT_ID));
-    //Attempt to create folders and copy css, js, and image files
+                                                                                //the id should be set on BUTTON PRESS
     $local->createBaseFolders();
     $local->copyCssFiles('css');
     $local->copyJsFiles('js');
@@ -66,28 +62,28 @@
 
 <html>
  
-        <div id="container"></div>
+ <div id="container">YEET</div>
 
-        <script>
+ <script>
 
-            var xmlhttp = new XMLHttpRequest();
-            xmlhttp.onreadystatechange = function() {
-                if (this.readyState == 4 && this.status == 200) {
-                    var jsArr = JSON.parse(this.responseText);
-                    //document.getElementById("demo").innerHTML = myObj.name;
-                }
-            };
-            xmlhttp.open("GET", "info.json", true); //post? regex s.match(/^\d/) for start with number
-            xmlhttp.send();
+     var xmlhttp = new XMLHttpRequest();
+     xmlhttp.onreadystatechange = function() {
+         if (this.readyState == 4 && this.status == 200) {
+             var input = JSON.parse(this.responseText); 
+             console.log("Json parsed data is: " + JSON.stringify(input)); 
+         }
+         var container = document.getElementById("container");
+         for (var i in input ) 
+         {   
+             if (i.match(/^\d/)){ 
+                 console.log('match!' + i);
+                 container.innerHTML += '<div class="box" style="width:50%; height:50px; background:rgb(212, 206, 206); border:thin dotted">' + input[i].id +  '<button type="button">Sync</button></div>';
+             }
+         } 
+     };
+     xmlhttp.open("GET", "TildaSync/info.json", true);
+     xmlhttp.send();
 
-            var container = document.getElementById("container");
-            for (var i = 0; i < idArr.length; i++) 
-            {   
-                if (jsArr[i].match(/^\d/)){ //does this check index or ele?
-                    container.innerHTML += '<div class="box" style="width:50%; height:50px; background:rgb(212, 206, 206); border:thin dotted">' + idArr[i]['id'] +  '</div>';
-                }
-            } 
-
-        </script>
+ </script>
 
 </html>
