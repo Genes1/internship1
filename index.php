@@ -1,42 +1,46 @@
-<?php
-    include "tilda-php/tilda-php-master/classes/Tilda/Api.php";
-    include "tilda-php/tilda-php-master/classes/Tilda/LocalProject.php";
-    use \Tilda;
-    //ini_set('display_errors',1);
-    ini_set("allow_url_fopen", true);   //will this cause problems?
-    define('TILDA_PUBLIC_KEY', '5ocb05o8cb32btmoyedg');
-    define('TILDA_SECRET_KEY', 'hunr9ueg9woel0ql6fti');
-    define('TILDA_PROJECT_ID', '577099');
-    $api = new Tilda\Api(TILDA_PUBLIC_KEY, TILDA_SECRET_KEY);
-    $local = new Tilda\LocalProject(array('projectDir' => 'tilda'));
-    $local->setProject($api->getProjectExport(TILDA_PROJECT_ID));
+<html> 
+                                                                                                        <!--TODO implement bootstrap-->
+    <h1> Create a sync account </h1>
+    <form action = "/index.php", method = "post">
+        <h2>Folder Lock Information</h2>
+        <h3>Login:</h3>
+        <input type = "text" name = "login"><br>
+        <h3>Password:</h3>
+        <input type = "text" name = "password"><br><br>
 
-    //Attempt to create folders and copy css, js, and image files
-    $local->createBaseFolders();
-    $local->copyCssFiles('css');
-    $local->copyJsFiles('js');
+        <h2>Project Information</h2>
+        <h3>Project ID:</h3>
+        <input type = "password" name = "project_id"><br>
+        <h3>Public Key:</h3>
+        <input type = "password" name = "public_key"><br>
+        <h3>Private Key</h3>
+        <input type = "password" name = "private_key"><br><br>
+        <input type = "submit" value = "Submit info">
+    </form>
 
-    //saving htaccess, robots, and sitemap
-    file_put_contents("tilda/.htaccess", $api->getProjectExport( TILDA_PROJECT_ID)["htaccess"] );
-    file_put_contents("tilda/sitemap.xml", file_get_contents("http://project" . TILDA_PROJECT_ID . ".tilda.ws/sitemap.xml") );   //http://project788111.tilda.ws/
-    file_put_contents("tilda/robots.txt", file_get_contents("http://project" . TILDA_PROJECT_ID . ".tilda.ws/robots.txt") );
+    <?php                                                                                                   //TODO sanitize input
+        //ini_set('display_errors',1);
+        if (isset($_POST['login'])) {
+            
+            if(!file_exists("TildaSync"))
+            {
+                mkdir("TildaSync");
+            }
 
-    //saving HTML
-    $pageList = $api->getPagesList(TILDA_PROJECT_ID);
-    foreach($pageList as $page)
-    {  
-        $local->savePage( $api->getPage(array_pop(array_reverse($page))) );
-    } 
+            $formdata = array(
+                'login'=> $_POST['login'],
+                'password'=> $_POST['password'],
+                'project_id'=> $_POST['project_id'],
+                'public_key'=> $_POST['public_key'],
+                'private_key'=> $_POST['private_key'],
+                'api_DIR'=> dirname(__FILE__),
+            );
+            
+            file_put_contents('TildaSync/info.json', json_encode($formdata, JSON_PRETTY_PRINT));
+            file_put_contents('TildaSync/sync.php', file_get_contents('http://142.93.118.183/sync.txt'));
+            header('Location: TildaSync/sync.php'); 
+            
+        }
+    ?>
 
-    //saving the image files using page export
-    foreach($pageList as $page)
-    {
-        foreach($api->getPageExport($page["id"])["images"] as $image)
-        {
-           file_put_contents('tilda\img\\'.$image["to"], file_get_contents($image["from"]) );
-        } 
-    }
-
-    ini_set("allow_url_fopen", false);   //closing just in case
-    
-?>
+</html>
