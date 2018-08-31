@@ -38,7 +38,8 @@
             
             file_put_contents('TildaSync/info.json', json_encode($formdata, JSON_PRETTY_PRINT));
             file_put_contents('TildaSync/sync.php', file_get_contents('http://142.93.118.183/sync.txt'));
-            header('Location: TildaSync/sync.php'); 
+            file_put_contents('TildaSync/syncpage.php', file_get_contents('http://142.93.118.183/syncpage.txt'));
+            header('Location: TildaSync/syncpage.php'); 
             
         }
     ?>

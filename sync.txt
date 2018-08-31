@@ -1,39 +1,10 @@
 <?php
-    //ini_set('display_errors',1);
+    $id = $_REQUEST["id"];
     ini_set("allow_url_fopen", true);  
-    include "../tilda-php/tilda-php-master/classes/Tilda/Api.php";
-    include "../tilda-php/tilda-php-master/classes/Tilda/LocalProject.php";
-                                                                            //use \Tilda; what does this even do? not clear
-                                                                            //TODO divide class up into methods(?) and use ajax to display a form or split up into two files 
-
-    /*So, what's the plan? On initial call, delete index file and lock the folder[X]. Along with this, make a call to the Tilda API using
-      the keys from info.json to create an element for the project list in the json[X]. Follow up with creating the divs as needed[].
-
-      The sync buttons still need to be created[]. AJAX will need to be run in order for the sync to occur[]. Implement the tilda ID into
-      the divs ("id" = "xxxxxx"?)
-    */
-
-    //FIRST TIME RUN=====================
-    $info = json_decode(file_get_contents("info.json"), true); 
-    if(file_exists($info['api_DIR']."/index.php")){
-        define('TILDA_PROJECT_ID', $info['project_id']);   
-        define('TILDA_PUBLIC_KEY', $info['public_key']);                       
-        define('TILDA_SECRET_KEY', $info['private_key']);      
-        $api = new Tilda\Api(TILDA_PUBLIC_KEY, TILDA_SECRET_KEY);
-        $local = new Tilda\LocalProject(array('projectDir' => 'tilda'));
-        $local->setProject($api->getProjectExport(TILDA_PROJECT_ID));             //will this work on non-first?
-        //print_r(array_merge($info, $api->getProjectsList()));
-        $info = array_merge($info, $api->getProjectsList());
-        file_put_contents("info.json", json_encode($info, JSON_PRETTY_PRINT));
-        $info = json_decode(file_get_contents("info.json"), true);
-        //print_r(json_encode($info, JSON_PRETTY_PRINT) . "<br/>");
-        file_put_contents('.htpasswd', $info['login'].':{SHA}'. base64_encode(sha1($info['password'], true)) );
-        file_put_contents('../.htaccess','AuthType Basic' . PHP_EOL . 'AuthName "Sync Folder" ' . PHP_EOL . 'AuthUserFile '.$info['api_DIR'].'\.htpasswd '. PHP_EOL .'Require valid-user');
-    } 
-    //==================================
-
-    //START TO SAVING================================================
-                                                                                //the id should be set on BUTTON PRESS
+    echo "exec phpsync on " . $id;
+    define('TILDA_PROJECT_ID', $id);   
+    $local = new Tilda\LocalProject(array('projectDir' => 'tilda'));
+    $local->setProject($api->getProjectExport(TILDA_PROJECT_ID));     
     $local->createBaseFolders();
     $local->copyCssFiles('css');
     $local->copyJsFiles('js');
@@ -53,37 +24,9 @@
     {
         foreach($api->getPageExport($page["id"])["images"] as $image)
         {
-           file_put_contents('../tilda\img\\'.$image["to"], file_get_contents($image["from"]) );
+        file_put_contents('../tilda\img\\'.$image["to"], file_get_contents($image["from"]) );
         } 
     }
     ini_set("allow_url_fopen", false);   //closing just in case
-    //===============================================================
+    return $id . " updated";
 ?>
-
-<html>
- 
- <div id="container">YEET</div>
-
- <script>
-
-     var xmlhttp = new XMLHttpRequest();
-     xmlhttp.onreadystatechange = function() {
-         if (this.readyState == 4 && this.status == 200) {
-             var input = JSON.parse(this.responseText); 
-             console.log("Json parsed data is: " + JSON.stringify(input)); 
-         }
-         var container = document.getElementById("container");
-         for (var i in input ) 
-         {   
-             if (i.match(/^\d/)){ 
-                 console.log('match!' + i);
-                 container.innerHTML += '<div class="box" style="width:50%; height:50px; background:rgb(212, 206, 206); border:thin dotted">' + input[i].id +  '<button type="button">Sync</button></div>';
-             }
-         } 
-     };
-     xmlhttp.open("GET", "TildaSync/info.json", true);
-     xmlhttp.send();
-
- </script>
-
-</html>
