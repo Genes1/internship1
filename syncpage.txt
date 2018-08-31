@@ -12,6 +12,7 @@
 
     //FIRST TIME RUN=====================
     $info = json_decode(file_get_contents("info.json"), true); 
+    print_r($info);
     if(file_exists("../index.php")){
         unlink("../index.php");
         define('TILDA_PUBLIC_KEY', $info['public_key']);                       
@@ -32,6 +33,9 @@
 
 <html>
     <div id="container"></div>
+    <button onClick="clear()">clear</button>
+    <div class="box" id="updatelog" style="background:rgb(182, 194, 255); overflow:auto; height:500px; border-style:solid;border-width:thin " ><div>
+
     <script>
         
         const xhr = new XMLHttpRequest();
@@ -42,17 +46,16 @@
                 for (var i in input ) {
                     if (i.match(/^\d/)){ 
                         var id = input[i].id;
-                        container.innerHTML +=                                              //TODO dix the outlines
+                        container.innerHTML +=                                              //TODO fix the outlines
                             "<div class = \"box\" id = \"div" + 
                             id + 
-                            "\" style = \" width:50%; height:50px; background:rgb(212, 206, 206); border: \"thin\" >" + 
+                            "\" style =  \" width:50%; height:50px; background:rgb(212, 206, 206); border-style:solid; border-width:thin \">" + 
                             id +  
                             "<button type = \"button\" id = \"button" + 
                             id + 
                             "\" onClick = \"sync("+ 
                             id +
-                            ")\"> Sync </button></div>"; 
-                            
+                            ")\" style = \"position:absolute; right:55%; padding:10px;\"> Sync </button></div>"; 
                     }
                 }
             } else {
@@ -64,16 +67,27 @@
         
         
         //=========================================================
-        
-        function sync(id){
-            var xmlhttp = new XMLHttpRequest();
-            xmlhttp.onreadystatechange = function() {
-                if (this.readyState == 4 && this.status == 200) {
-                    document.getElementById("div" + id).innerHTML = this.responseText;
-                }
+        function clear(){
+            var div = document.getElementById('updatelog');
+            while(div.firstChild){
+                div.removeChild(div.firstChild);
             }
-            xmlhttp.open("GET", "sync.php?id="+ " \" " + id + " \" ", true);
-            xmlhttp.send();
+        }
+
+        function sync(id){                                      //TODO freeze button activity 
+            const xhr2 = new XMLHttpRequest();
+            const zone = document.getElementById("updatelog");
+            xhr2.onreadystatechange = function() { 
+                if (this.readyState === 4 && this.status === 200) {
+                    //const div = document.getElementById("div" + id);
+                    //zone.innerHTML += this.responseText;
+                    zone.innerHTML += this.responseText;
+                } else {
+                    //console.log("An error occurred.");
+                }
+            };
+            xhr2.open("GET", "sync.php?id="+id, true);
+            xhr2.send();
         }
         
 
