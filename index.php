@@ -18,7 +18,12 @@
         <input type = "submit" value = "Submit info">
     </form>
 
-    <?php                                                                                                   //TODO sanitize input
+    <?php                                                                                                   
+    /*  1. Sanitize input             []
+
+        BUGLIST
+        - 
+    */
         //ini_set('display_errors',1);
         if (isset($_POST['login'])) {
             
