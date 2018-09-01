@@ -4,9 +4,13 @@
     include "../tilda-php/tilda-php-master/classes/Tilda/LocalProject.php";
     set_time_limit(60);
     //ini_set('display_errors',1);
+    /*  1. Fix the naming bug                                                      []
+        2. Check if project folder exists for non-destructive sync                 []
+        3. Check for empty categories                                              []
+    */
     ini_set("allow_url_fopen", true);  
     $info = json_decode(file_get_contents("info.json"), true); 
-    echo "<center><h1>Saving " . $id . "</b></center><br>";
+    //echo "<center><h1>Saving " . $id . "</b></center> <p style=\"font-color:gray\">" . localtime(time(), true)[3] . date('g:i:s A') .  "</p> <br>";
     define('TILDA_PROJECT_ID', $id);  
     define('TILDA_PUBLIC_KEY', $info['public_key']);                       
     define('TILDA_SECRET_KEY', $info['private_key']);      
@@ -17,15 +21,37 @@
     $local->copyCssFiles('css');
     $local->copyJsFiles('js');
 
+    //nondestruct
+    /*
+        if (file_exists("project".$id) && is_dir("project".$id)){
+            set some variable to true
+            modify rest of code to check for file existence before replacement
+        }
+
+    */
+
+    //loading DOM                           can I even use dom? probably but diff setup needed
+    /*
+    $dom = new DOMDocument();
+    $dom->load("syncpage.php");
+    $dom->validate();
+    $div = $dom->getElementById('updatelog');
+    echo "<script>var d1 = document.getElementById('updatelog'); d1.insertAdjacentHTML('afterbegin', 'html from php'); </script>";
+    */
+ 
     //saving htaccess, robots, and sitemap
+    echo "<b> SAVING MISC </b> <hr>";
     file_put_contents("../tilda/.htaccess", $api->getProjectExport( TILDA_PROJECT_ID)["htaccess"] );
+    echo "htaccess saved  <br>";
     file_put_contents("../tilda/sitemap.xml", file_get_contents("http://project" . TILDA_PROJECT_ID . ".tilda.ws/sitemap.xml") );
+    echo "sitemap saved  <br>";
     file_put_contents("../tilda/robots.txt", file_get_contents("http://project" . TILDA_PROJECT_ID . ".tilda.ws/robots.txt") );
+    echo "robots saved  <br>";
     //file_put_contents("../tilda/404.html", file_get_contents("http://project" . TILDA_PROJECT_ID . ".tilda.ws/404.html") ); //doesn't currently work
 
     //saving HTML
     $pageList = $api->getPagesList(TILDA_PROJECT_ID);
-    echo "<b> SAVING PAGES </b> <hr> <br>";
+    echo "<br><b> SAVING PAGES </b> <hr> ";
     foreach($pageList as $page)
     {  
         $local->savePage( $api->getPage(array_pop(array_reverse($page))) );
@@ -33,13 +59,13 @@
     } 
 
     //saving the image files using page export
-    echo "<br><b> SAVING IMAGES </b> <hr> <br>";
+    echo "<br><b> SAVING IMAGES </b> <hr>";
     foreach($pageList as $page)
     {
         foreach($api->getPageExport($page["id"])["images"] as $image)
         {
             file_put_contents('../tilda\img\\'.$image["to"], file_get_contents($image["from"]) );
-            echo "Image saved as " . $image["to"] . " <br>";
+            echo "Image saved: " . $image["to"] . " <br>";
         } 
     }   
 
@@ -56,7 +82,8 @@
         }
         rmdir($dir);
     }                                                           //TODO implement correct pathing (user specified)
-    rename("../tilda", "../project" . $id);
+    sleep(3);
+    rename("../tilda", "../project" . $id);    //rename arg1 to arg2
     ini_set("allow_url_fopen", false);   
-    echo "<hr><i>Project " . $id . " finished syncing.</i>";
+    echo "<i><center>Project " . $id . " finished syncing.</center></i>";
 ?>
