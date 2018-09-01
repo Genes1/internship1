@@ -47,7 +47,7 @@
                 for (var i in input ) {
                     if (i.match(/^\d/)){ 
                         var id = input[i].id;   //I have to get the name/description of the project 
-                        container.innerHTML += "<div class = \"box\" id = \"div" + id + "\" style =  \" font-size:30px; width:100%; height:40px; background:rgb(212, 206, 206); border-style:solid; border-width:thin\" vertical-align: middle; line-height: 40px;>" + id +  "<button type = \"button\" id = \"button" + id + "\" onClick = \"sync("+ id +")\" height:40px; style = \"position:absolute; right:5%; vertical-align: middle; line-height: 40px; \"> Sync </button></div>"; 
+                        container.innerHTML += "<div class = \"box\" id = \"div" + id + "\" style =  \" font-size:30px; width:100%; height:40px; background:rgb(212, 206, 206); border-style:solid; border-width:thin\" vertical-align: middle; line-height: 40px;>" + id +  "<button type = \"button\" id = \"button" + id + "\" onClick = \"sync("+ id +")\" height:20px; style = \"position:absolute; right:5%; vertical-align: middle; line-height: 20px; padding:10px \"> Sync </button></div>"; 
                     }
                 }
             } else {
