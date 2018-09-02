@@ -6,10 +6,11 @@
     include "../tilda-php/tilda-php-master/classes/Tilda/LocalProject.php";
     /*  TO DO
         1. Let user choose install path                                                             []
-        2. Update divs to show name, desc, id, last synced, etc. (investigate time as last synced)  []
-        3. Update by page within project                                                            []
-        4. Fix tilda htaccess   https://github.com/tivie/php-htaccess-parser                        []
-        5. Make the clear button work - or remove it                                                []
+        2. Update divs to show name, desc, id, last synced, etc. (investigate time as last synced)  []  INTO table 
+        3. Fix tilda htaccess   https://github.com/tivie/php-htaccess-parser                        []
+        4. Make the clear button work - or remove it                                                []
+
+        X. Update by page within project                                                            []
 
         BUG LIST
         - htaccess still requests password after initial loadup
@@ -25,15 +26,19 @@
         define('TILDA_PUBLIC_KEY', $info['public_key']);                       
         define('TILDA_SECRET_KEY', $info['private_key']);      
         $api = new Tilda\Api(TILDA_PUBLIC_KEY, TILDA_SECRET_KEY);
-        //print_r(array_merge($info, $api->getProjectsList()));
         $info = array_merge($info, $api->getProjectsList());
+        foreach($info as $i) {
+            $ind = array_search ($i, $info);
+            if ( preg_match("/^\d/", $ind ) ){ 
+                $info[$ind]['savedlocation'] = __DIR__ . "project" . $i['id'];
+            }
+        }
         file_put_contents("info.json", json_encode($info, JSON_PRETTY_PRINT));
         $info = json_decode(file_get_contents("info.json"), true);
-        //print_r(json_encode($info, JSON_PRETTY_PRINT) . "<br/>");
         file_put_contents('../.htpasswd', $info['login'].':{SHA}'. base64_encode(sha1($info['password'], true)) );
         file_put_contents('.htaccess','AuthType Basic' . PHP_EOL . 'AuthName "Sync Folder" ' . PHP_EOL . 'AuthUserFile '.$info['api_DIR'].'\.htpasswd '. PHP_EOL .'Require valid-user'. PHP_EOL .'Allow from 99.88.77.66'. PHP_EOL ."Satisfy Any");
     } 
-    ini_set("allow_url_fopen", false);   //closing just in case
+    ini_set("allow_url_fopen", false);  
 
 ?>
 
@@ -52,10 +57,13 @@
                 const container = document.getElementById("container");
                 let input = JSON.parse(this.responseText);
                 for (let i in input ) {
-                    if (i.match(/^\d/)){ 
-                        var id = input[i].id;   //I have to get the name/description of the project 
-                        container.innerHTML += "<div class = \"box\" id = \"div" + id + "\" style =  \" font-size:30px; width:100%; height:40px; background:rgb(212, 206, 206); border-style:solid; border-width:thin\" vertical-align: middle; line-height: 40px;>" + input[i].title + " [id " + id + "]" +  "<button type = \"button\" id = \"button" + id + "\" onClick = \"sync("+ id +")\" height:20px; style = \"position:absolute; right:5%; vertical-align: middle; \"> Sync </button></div>"; 
-                    }
+                    if (i.match(/^\d/)){ //make a table 
+                        var id = input[i].id; 
+                        container.innerHTML += "<div class = \"box\" id = \"div" + id + "\" style =  \" font-size:20px; width:100%; height:40px; background:rgb(212, 206, 206); border-style:solid; border-width:thin\" vertical-align: middle; line-height: 40px;>" 
+                        + input[i].title + " [id " + id + "]"
+                        + "\xa0\xa0\xa0\xa0\xa0ROOT/" + "<input id = \"input" + id + "\" type=\"text\" name=\" path"+ id +" \">" 
+                        + "<button type = \"button\" id = \"button" + id + "\" onClick = \"sync("+ id +")\" height:20px; style = \"position:absolute; right:5%; vertical-align: middle; \"> Sync </button></div>"; 
+                    }  
                     container.innerHTML += "<br>";
                 }
             } else {
@@ -65,7 +73,7 @@
         xhr.open("GET", "info.json");
         xhr.send(); 
         
-        /*                      get this working
+        /*
         function clear(){
             var div = document.getElementById('updatelog');
             while(div.firstChild){
@@ -83,7 +91,7 @@
                     zone.insertAdjacentHTML("afterbegin", this.responseText); 
                     zone.insertAdjacentHTML("afterbegin", "<center><h1>Saving " + id + "<p style = \" font-size:15px; color:gray\">" + time.toLocaleTimeString()  + "</p> </center>");
                     synctext.innerHTML = "";
-                    synctext.scrollTop = 0;
+                    //synctext.scrollTop = 0; dont work
                     //zone.innerHTML += this.responseText;
                 } else {
                     //console.log("An error occurred.");

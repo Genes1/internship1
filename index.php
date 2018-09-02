@@ -9,8 +9,6 @@
         <input type = "text" name = "password"><br><br>
 
         <h2>Project Information</h2>
-        <h3>Project ID:</h3>
-        <input type = "password" name = "project_id" value = "577099"><br>
         <h3>Public Key:</h3>
         <input type = "password" name = "public_key" value = "5ocb05o8cb32btmoyedg"><br>
         <h3>Private Key</h3>
@@ -19,12 +17,12 @@
     </form>
 
     <?php                                                                                                   
-    /*  1. Sanitize input             []
+    /*  TODO
+        1. Sanitize input             []
 
         BUGLIST
         - 
     */
-        //ini_set('display_errors',1);
         if (isset($_POST['login'])) {
             
             if(!file_exists("TildaSync"))
@@ -35,7 +33,6 @@
             $formdata = array(
                 'login'=> $_POST['login'],
                 'password'=> $_POST['password'],
-                'project_id'=> $_POST['project_id'],
                 'public_key'=> $_POST['public_key'],
                 'private_key'=> $_POST['private_key'],
                 'api_DIR'=> dirname(__FILE__),

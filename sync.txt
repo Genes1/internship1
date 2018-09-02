@@ -45,11 +45,11 @@
  
     //saving htaccess, robots, and sitemap
     echo "<b> SAVING MISC </b> <hr>";
-    file_put_contents("../tilda/.htaccess", $api->getProjectExport( TILDA_PROJECT_ID)["htaccess"] );
+    file_put_contents("../tilda". $id ."/.htaccess", $api->getProjectExport( TILDA_PROJECT_ID)["htaccess"] );
     echo "htaccess saved  <br>";
-    file_put_contents("../tilda/sitemap.xml", file_get_contents("http://project" . TILDA_PROJECT_ID . ".tilda.ws/sitemap.xml") );
+    file_put_contents("../tilda". $id ."/sitemap.xml", file_get_contents("http://project" . TILDA_PROJECT_ID . ".tilda.ws/sitemap.xml") );
     echo "sitemap saved  <br>";
-    file_put_contents("../tilda/robots.txt", file_get_contents("http://project" . TILDA_PROJECT_ID . ".tilda.ws/robots.txt") );
+    file_put_contents("../tilda". $id ."/robots.txt", file_get_contents("http://project" . TILDA_PROJECT_ID . ".tilda.ws/robots.txt") );
     echo "robots saved  <br>";
     //file_put_contents("../tilda/404.html", file_get_contents("http://project" . TILDA_PROJECT_ID . ".tilda.ws/404.html") ); //doesn't currently work
 
