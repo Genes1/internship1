@@ -36,6 +36,7 @@
                 'public_key'=> $_POST['public_key'],
                 'private_key'=> $_POST['private_key'],
                 'api_DIR'=> dirname(__FILE__),
+                'synced' => false,
             );
             
             file_put_contents('TildaSync/info.json', json_encode($formdata, JSON_PRETTY_PRINT));

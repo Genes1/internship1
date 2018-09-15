@@ -73,12 +73,14 @@ class LocalProject
                 $this->projectDir = substr($this->projectDir,1);
             }
 
+            /*
             if (! file_exists($this->baseDir . $this->projectDir)) {
                 if (!mkdir($this->baseDir . $this->projectDir, 0776, true)) {
                     throw new Exception('Cannot create Project dir [' . $this->baseDir.$this->projectDir . ']'."\n");
                 }
             }
-
+            */
+            
             if (substr($this->projectDir,-1) != DIRECTORY_SEPARATOR &&  substr($this->projectDir,-1) != '/') {
                 $this->projectDir .= DIRECTORY_SEPARATOR;
             }
@@ -310,7 +312,7 @@ class LocalProject
         
         if (! file_exists($fullprojectdir.'css')) {
             if (mkdir($fullprojectdir.'css', 0776, true)){
-                echo "Folder created: ".$fullprojectdir.'css'."\n";
+                //echo "Folder created: ".$fullprojectdir.'css'."\n";
             } else {
                 $this->lastError .= "Failed folder creation: ".$fullprojectdir.'css'."\n";
                 $flag = false;
@@ -319,7 +321,7 @@ class LocalProject
         
         if (!file_exists($fullprojectdir.'js')) {
             if (mkdir($fullprojectdir.'js', 0776, true)){
-                echo "Folder created: ".$fullprojectdir.'js'."\n";
+                //echo "Folder created: ".$fullprojectdir.'js'."\n";
             }else{
                 $this->lastError .= "Failed folder creation: ".$fullprojectdir.'js'."\n";
                 $flag=false;
@@ -328,13 +330,13 @@ class LocalProject
         
         if (!file_exists($fullprojectdir.'img')) {
             if (mkdir($fullprojectdir.'img', 0776, true)) {
-                echo "Folder created: ".$fullprojectdir.'img'."\n";
+                //echo "Folder created: ".$fullprojectdir.'img'."\n";
             } else {
                 $this->lastError .= "Failed folder creation: ".$fullprojectdir.'img'."\n";
                 $flag=false;
             }
         }
-        
+        /*
         if (!file_exists($fullprojectdir.'meta')) {
             if (mkdir($fullprojectdir.'meta', 0776, true)) {
                 echo "Folder created: ".$fullprojectdir.'meta'."\n";
@@ -343,7 +345,7 @@ class LocalProject
                 $flag=false;
             }
         }
-
+        */
         return($flag);
     }
 
@@ -414,7 +416,7 @@ class LocalProject
             $ext = '';
         }
         
-        echo "==> copy file from: $from ".($isRewrite ? 'with rewrite' : 'without rewirite')."\n";
+        //echo "==> copy file from: $from ".($isRewrite ? 'with rewrite' : 'without rewirite')."\n";
         /* если */
         if (file_exists($fullprojectdir.$newfile.'.'.$ext) && $isRewrite==false) {
             echo 'File already exist: ' . $newfile . ".$ext\n"; 
@@ -477,7 +479,7 @@ class LocalProject
                 }
             }
             
-            echo('File copied: '. $fullprojectdir . $newfile.".$ext\n");
+            //echo('File copied: '. $fullprojectdir . $newfile.".$ext\n");
             
             /* переименовываем файл, добавляя ему расширение */
             rename($fullprojectdir  . $newfile, $fullprojectdir . $newfile . '.' . $ext);

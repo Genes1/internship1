@@ -6,9 +6,9 @@
     include "../tilda-php/tilda-php-master/classes/Tilda/LocalProject.php";
     /*  TO DO
         1. Let user choose install path                                                             []
-        2. Update divs to show name, desc, id, last synced, etc. (investigate time as last synced)  []  INTO table 
-        3. Fix tilda htaccess   https://github.com/tivie/php-htaccess-parser                        []
-        4. Make the clear button work - or remove it                                                []
+            a. Check for diff types of slashes that might be used, hardcoded with '/'
+        2. Fix tilda htaccess   https://github.com/tivie/php-htaccess-parser                        []
+        3. Update divs to show name, desc, id, last synced, etc. (investigate time as last synced)  []  INTO table         4. Make the clear button work - or remove it                                                []
 
         X. Update by page within project                                                            []
 
@@ -30,7 +30,7 @@
         foreach($info as $i) {
             $ind = array_search ($i, $info);
             if ( preg_match("/^\d/", $ind ) ){ 
-                $info[$ind]['savedlocation'] = __DIR__ . "project" . $i['id'];
+                $info[$ind]['savedlocation'] = "project" . $i['id'];
             }
         }
         file_put_contents("info.json", json_encode($info, JSON_PRETTY_PRINT));
@@ -49,18 +49,23 @@
     <div class="box" id="updatelog" style="background:rgb(182, 194, 255); overflow:auto; height:500px; border-style:solid; border-width:thin; padding:10px" ><div>
 
     <script>
+
         const zone = document.getElementById("updatelog");
         const synctext = document.getElementById("syncing");
         const xhr = new XMLHttpRequest();
+        var permainfo;
+        var time;
+
         xhr.onreadystatechange = function() { 
             if (this.readyState === 4 && this.status === 200) {
                 const container = document.getElementById("container");
-                let input = JSON.parse(this.responseText);
-                for (let i in input ) {
+                var info = JSON.parse(this.responseText);
+                permainfo = JSON.parse(JSON.stringify(info));
+                for (let i in info ) {
                     if (i.match(/^\d/)){ //make a table 
-                        var id = input[i].id; 
+                        var id = info[i].id; 
                         container.innerHTML += "<div class = \"box\" id = \"div" + id + "\" style =  \" font-size:20px; width:100%; height:40px; background:rgb(212, 206, 206); border-style:solid; border-width:thin\" vertical-align: middle; line-height: 40px;>" 
-                        + input[i].title + " [id " + id + "]"
+                        + info[i].title + " [id " + id + "]"
                         + "\xa0\xa0\xa0\xa0\xa0ROOT/" + "<input id = \"input" + id + "\" type=\"text\" name=\" path"+ id +" \">" 
                         + "<button type = \"button\" id = \"button" + id + "\" onClick = \"sync("+ id +")\" height:20px; style = \"position:absolute; right:5%; vertical-align: middle; \"> Sync </button></div>"; 
                     }  
@@ -72,7 +77,21 @@
         };
         xhr.open("GET", "info.json");
         xhr.send(); 
-        
+
+        function updateinfo(){
+            var updater = new XMLHttpRequest();
+                xhr.onreadystatechange = function() { 
+                if (this.readyState === 4 && this.status === 200) {
+                    var info = JSON.parse(this.responseText);
+                    permainfo = JSON.parse(JSON.stringify(info));
+
+                } else {
+                    //console.log("An error occurred.");
+                }
+            };
+            updater.open("GET", "info.json");
+            updater.send(); 
+        }
         /*
         function clear(){
             var div = document.getElementById('updatelog');
@@ -81,28 +100,24 @@
             }
         }
         */
-
-        function sync(id){            
-            synctext.innerHTML += "Syncing Project " + id + "...";//add title somehow
+        function sync(id){       
+            synctext.innerHTML += "Syncing Project " + id + "..."; //add title if not empty
             const xhr2 = new XMLHttpRequest();
             xhr2.onreadystatechange = function() { 
                 if (this.readyState === 4 && this.status === 200) {
-                    var time = new Date();                                      //this is global, last synced potential, toLocaleString() 
+                    time = new Date();                                      //this is global, last synced potential, toLocaleString() 
                     zone.insertAdjacentHTML("afterbegin", this.responseText); 
                     zone.insertAdjacentHTML("afterbegin", "<center><h1>Saving " + id + "<p style = \" font-size:15px; color:gray\">" + time.toLocaleTimeString()  + "</p> </center>");
                     synctext.innerHTML = "";
-                    //synctext.scrollTop = 0; dont work
-                    //zone.innerHTML += this.responseText;
                 } else {
                     //console.log("An error occurred.");
                 }
-            };
-            xhr2.open("GET", "sync.php?id="+id, true);
+            };                                              
+            xhr2.open("GET", "sync.php?id=" + id + "&loc=" + encodeURIComponent(permainfo[Object.keys(permainfo).find(key => permainfo[key].id == id)].savedlocation) + "&dloc=" + encodeURIComponent(document.getElementById("input" + id).value) , true);
             xhr2.send();
             
         }
         
-
     </script>
 
 </html>
