@@ -15,21 +15,21 @@
     set_time_limit(0);
     //ini_set('display_errors',1);
     ini_set("allow_url_fopen", true);  
+    ini_set("auto_detect_line_endings", true);
     define('TILDA_PROJECT_ID', $id);  
     define('TILDA_PUBLIC_KEY', $info['public_key']);
     define('TILDA_SECRET_KEY', $info['private_key']);
     $api = new Tilda\Api(TILDA_PUBLIC_KEY, TILDA_SECRET_KEY); 
-    /*  1. Fix the naming bug                                                      []
-        2. Check if project folder exists for non-destructive sync                 []
-        3. Check for empty categories                                              []
-        4. Update live
+    /*  TODO
+        1. Check if project folder exists for non-destructive sync                 []
+        2. Check for empty categories                                              []
+        3. Update live
     */
 
     $fullpath = explode("/", $dloc);
     //fullpath is the saved loc exploded, dont think it should be spliced 
 
     $compath = rtrim($api_DIR, "/ ");
-    echo $compath."<br>";
     //compath is htdocs/123
     
     foreach($fullpath as $dirpart){
@@ -38,28 +38,16 @@
             if(!is_dir($compath)){ 
                 unlink($compath);
             }
-        } else {mkdir($compath); echo $compath." created <br>";}   
+        } else {mkdir($compath);}   
 
     }
 
-    echo "projectDir ".$api_DIR.$dloc ." <br>";
-
     $local = new Tilda\LocalProject(array('projectDir' => $dloc));
     $local->setProject($api->getProjectExport(TILDA_PROJECT_ID));
-    //if(!file_exists($api_DIR.$dloc)){     
-        $local->createBaseFolders();
-    //}
+    $local->createBaseFolders();
     $local->copyCssFiles('css');
     $local->copyJsFiles('js');
 
-    //nondestruct
-    /*
-        if (file_exists("project".$id) && is_dir("project".$id)){
-            set some variable to true
-            modify rest of code to check for file existence before replacement
-        }
-
-    */
 
     //loading DOM                           can I even use dom? probably but diff setup needed
     /*
@@ -72,7 +60,7 @@
  
     //saving htaccess, robots, and sitemap
     echo "<b> SAVING MISC </b> <hr>";
-    file_put_contents("../".$dloc ."/.htaccess", $api->getProjectExport( TILDA_PROJECT_ID)["htaccess"] );
+    file_put_contents("../".$dloc ."/htaccess", $api->getProjectExport( TILDA_PROJECT_ID)["htaccess"] );
     echo "htaccess saved  <br>";
     file_put_contents("../". $dloc ."/sitemap.xml", file_get_contents("http://project" . TILDA_PROJECT_ID . ".tilda.ws/sitemap.xml") );
     echo "sitemap saved  <br>";
@@ -102,7 +90,7 @@
         {
             foreach($api->getPageExport($page["id"])["images"] as $image)
             {
-                file_put_contents('../'.$dloc.'\img\\'.$image["to"], file_get_contents($image["from"]) );    //PROBLEMS FOR CUSTOM NAME
+                file_put_contents('../'.$dloc.'\img\\'.$image["to"], file_get_contents($image["from"]) ); 
                 echo "<a target=\"_blank\" rel=\"noopener noreferrer\" href=\"" . $image["from"] . "\">Image saved</a>: <b>" . $image["to"] . "</b><br>";
             } 
         }   
@@ -122,9 +110,7 @@
             }
         }
         rmdir($dir);
-    }                                                           //TODO implement correct pathing (user specified)
-    //sleep(3);
-    rename("../tilda", "../project" . $id);    //rename arg1 to arg2
+    }
     */
 
     ini_set("allow_url_fopen", false);   
