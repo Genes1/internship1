@@ -10,10 +10,13 @@
 
     $api_DIR = str_replace("\\", "/", $info['api_DIR']."/");
     //api dir with / and / at the end
+
     include "../tilda-php/tilda-php-master/classes/Tilda/Api.php";
     include "../tilda-php/tilda-php-master/classes/Tilda/LocalProject.php";
     set_time_limit(0);
     //ini_set('display_errors',1);
+
+
     ini_set("allow_url_fopen", true);  
     ini_set("auto_detect_line_endings", true);
     define('TILDA_PROJECT_ID', $id);  
@@ -112,6 +115,15 @@
         rmdir($dir);
     }
     */
+
+    foreach($info as $i) {
+        if ( $info[$i].id == $id){ 
+            $info[$ind]['savedlocation'] = $compath;
+        }
+    }
+
+    //$info[].savedlocation = $compath;
+    file_put_contents("info.json", json_encode($info, JSON_PRETTY_PRINT));
 
     ini_set("allow_url_fopen", false);   
     echo "<i><center>Project " . $id . " finished syncing.</center></i>";

@@ -5,7 +5,6 @@
     include "../tilda-php/tilda-php-master/classes/Tilda/Api.php";
     include "../tilda-php/tilda-php-master/classes/Tilda/LocalProject.php";
     /*  TO DO
-        1. Fix tilda htaccess   https://github.com/tivie/php-htaccess-parser                        []
         2. Update divs to show name, desc, id, last synced, etc. (investigate time as last synced)  []  INTO table         
         3. Make the clear button work - or remove it                                                []
         4. Fix "savedlocation"                                                                      []
@@ -25,7 +24,7 @@
         unlink("../index.php");
         define('TILDA_PUBLIC_KEY', $info['public_key']);                       
         define('TILDA_SECRET_KEY', $info['private_key']);      
-        $api = new Tilda\Api(TILDA_PUBLIC_KEY, TILDA_SECRET_KEY);
+        $api = new Tilda\Api(TILDA_PUBLIC_KEY, TILDA_SECRET_KEY); //not working - connection with API?
         $info = array_merge($info, $api->getProjectsList());
         foreach($info as $i) {
             $ind = array_search ($i, $info);

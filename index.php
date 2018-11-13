@@ -1,7 +1,10 @@
 <html> 
-                                                                                                        <!--TODO implement bootstrap-->
+    <!--
+        TODO implement bootstrap
+             download API as dir? copy dir style by file?
+    -->
     <h1> Create a sync account </h1>
-    <form action = "/index.php", method = "post">
+    <form action = "/index.php", method = "post"> <!-- -->
         <h2>Folder Lock Information</h2>
         <h3>Login:</h3>
         <input type = "text" name = "login"><br>
