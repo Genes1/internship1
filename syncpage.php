@@ -2,8 +2,8 @@
     clearstatcache();
     ini_set('display_errors',1);
     ini_set("allow_url_fopen", true);
-    include "../tilda-php/tilda-php-master/classes/Tilda/Api.php";
-    include "../tilda-php/tilda-php-master/classes/Tilda/LocalProject.php";
+    include "Api.php";
+    include "LocalProject.php";
     /*  TO DO
         2. Update divs to show name, desc, id, last synced, etc. (investigate time as last synced)  []  INTO table         
         3. Make the clear button work - or remove it                                                []
@@ -24,12 +24,12 @@
         unlink("../index.php");
         define('TILDA_PUBLIC_KEY', $info['public_key']);                       
         define('TILDA_SECRET_KEY', $info['private_key']);      
-        $api = new Tilda\Api(TILDA_PUBLIC_KEY, TILDA_SECRET_KEY); //not working - connection with API?
+        $api = new Tilda\Api(TILDA_PUBLIC_KEY, TILDA_SECRET_KEY); 
         $info = array_merge($info, $api->getProjectsList());
         foreach($info as $i) {
             $ind = array_search ($i, $info);
             if ( preg_match("/^\d/", $ind ) ){ 
-                $info[$ind]['savedlocation'] = "project" . $i['id'];
+                $info[$ind]['savedlocation'] = str_replace(" ", "_", $i['title']);
             }
         }
         file_put_contents("info.json", json_encode($info, JSON_PRETTY_PRINT));
@@ -45,7 +45,9 @@
 
     <style>
         table, th, td {
-            border: 1px solid black;
+            border-collapse: collapse;
+            border: 1px;
+            border-style: solid;
         }
         th, td {
             padding: 5px;
@@ -76,9 +78,10 @@
                 for (let i in info ) {
                     if (i.match(/^\d/)){ //make a table 
                         var id = info[i].id; 
-                        appendtext += "<tr> <td>" + info[i].title + "</td> <td><b>" + id + "</b></td>"
-                        + "<td> ROOT/" + "<input id = \"input" + id + "\" type=\"text\" name=\"path"+ id +" \"> </td>"
-                        + "<td> <button type = \"button\" id = \"button" + id + "\" onClick = \"sync("+ id +")\" style=\"height:20px; margin:auto\"; > Sync </button> </td> </tr>"; 
+                        appendtext +=   "<tr> <td>" + info[i].title + "</td>" + 
+                                        "<td><b>" + id + "</b></td>" + 
+                                        "<td> ROOT\\" + "<input id = \"input" + id + "\" type=\"text\" name=\"path"+ id +"\" value = \"" + info[i].savedlocation + "\" > </td>" +
+                                        "<td> <button type = \"button\" id = \"button" + id + "\" onClick = \"sync("+ id +")\" style=\"height:20px; margin:auto\"; > Sync </button> </td> </tr>"; 
                     }  
                 }
                 appendtext += "</table> <br>";

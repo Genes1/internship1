@@ -3,16 +3,11 @@
     $id = $_REQUEST["id"];    
 
     $loc = str_replace("\\", "/", urldecode($_REQUEST["loc"])); 
-    //loc is the saved dir with /              
-
-    $dloc = str_replace("\\", "/", urldecode($_REQUEST["dloc"]));
-    //dloc is the desired location to save      
-
+    $dloc = str_replace("\\", "/", urldecode($_REQUEST["dloc"]));     
     $api_DIR = str_replace("\\", "/", $info['api_DIR']."/");
-    //api dir with / and / at the end
 
-    include "../tilda-php/tilda-php-master/classes/Tilda/Api.php";
-    include "../tilda-php/tilda-php-master/classes/Tilda/LocalProject.php";
+    include "Api.php";
+    include "LocalProject.php";
     set_time_limit(0);
     //ini_set('display_errors',1);
 
@@ -24,16 +19,11 @@
     define('TILDA_SECRET_KEY', $info['private_key']);
     $api = new Tilda\Api(TILDA_PUBLIC_KEY, TILDA_SECRET_KEY); 
     /*  TODO
-        1. Check if project folder exists for non-destructive sync                 []
-        2. Check for empty categories                                              []
-        3. Update live
+        1. Check for empty categories                                              []
     */
 
     $fullpath = explode("/", $dloc);
-    //fullpath is the saved loc exploded, dont think it should be spliced 
-
     $compath = rtrim($api_DIR, "/ ");
-    //compath is htdocs/123
     
     foreach($fullpath as $dirpart){
         $compath = $compath."/".$dirpart;
@@ -115,10 +105,11 @@
         rmdir($dir);
     }
     */
-
-    foreach($info as $i) {
-        if ( $info[$i].id == $id){ 
-            $info[$ind]['savedlocation'] = $compath;
+    for ($x = 0; $x < count($info) - 6; $x++) {
+        if ( $info[$x]['id'] == $id ){ 
+            //echo "info[i].id == id is true somewhere <br>";
+            $info[$x]['savedlocation'] = str_replace($api_DIR, "", $compath);
+            //file_put_contents("tildasync/info.json", json_encode($info, JSON_PRETTY_PRINT));
         }
     }
 

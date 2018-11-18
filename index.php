@@ -28,9 +28,9 @@
     */
         if (isset($_POST['login'])) {
             
-            if(!file_exists("TildaSync"))
+            if(!file_exists("tildasync"))
             {
-                mkdir("TildaSync");
+                mkdir("tildasync");
             }
 
             $formdata = array(
@@ -42,10 +42,12 @@
                 'synced' => false,
             );
             
-            file_put_contents('TildaSync/info.json', json_encode($formdata, JSON_PRETTY_PRINT));
-            file_put_contents('TildaSync/sync.php', file_get_contents('http://142.93.118.183/sync.txt'));
-            file_put_contents('TildaSync/syncpage.php', file_get_contents('http://142.93.118.183/syncpage.txt'));
-            header('Location: TildaSync/syncpage.php'); 
+            file_put_contents('tildasync/info.json', json_encode($formdata, JSON_PRETTY_PRINT));
+            file_put_contents('tildasync/Api.php', file_get_contents('http://142.93.118.183/Api.txt'));
+            file_put_contents('tildasync/LocalProject.php', file_get_contents('http://142.93.118.183/LocalProject.txt'));
+            file_put_contents('tildasync/sync.php', file_get_contents('http://142.93.118.183/sync.txt'));
+            file_put_contents('tildasync/syncpage.php', file_get_contents('http://142.93.118.183/syncpage.txt'));
+            header('Location: tildasync/syncpage.php'); 
             
         }
     ?>
